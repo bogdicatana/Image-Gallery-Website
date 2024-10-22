@@ -69,9 +69,24 @@ const handleOnMove = e => {
     animation.onfinish = () => changeCenter();
 }
 
-// images.item(0).addEventListener('click', function(e){
-//     console.log(e.clientX);
-// });
+for(const image of images){
+    image.classList.add("default");
+}
+
+
+for(const image of images){
+    image.addEventListener('click', function(){
+        image.classList.add("expanded");
+        slide.classList.add("expanded");
+        const percentage = 0;
+        slide.animate({
+            transform: `translate(${percentage}%, 0%)`
+        }, {duration: 100, fill: "forwards"});
+        for(const image2 of images){
+            if(image2 != image) image2.classList.add("dead");
+        }
+    });
+}
 
 window.onmousedown = e => handleOnDown(e);
 
