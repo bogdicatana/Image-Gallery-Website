@@ -65,9 +65,13 @@ const handleOnMove = e => {
         transform: `translate(${nextPercentage}%, -50%)`
     }, { duration: 1200, fill: "forwards" });
 
-    setTimeout(changeCenter, 900)
+    setTimeout(changeCenter, 1000)
     animation.onfinish = () => changeCenter();
 }
+
+// images.item(0).addEventListener('click', function(e){
+//     console.log(e.clientX);
+// });
 
 window.onmousedown = e => handleOnDown(e);
 
