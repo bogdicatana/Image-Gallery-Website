@@ -4,8 +4,6 @@ const slide = document.getElementById("imageSlide");
 
 const title = document.getElementById("title")
 
-const handleOnDown = e => slide.dataset.mouseDownAt = e.clientX;
-
 let minSide;
 
 if(window.innerHeight > window.innerWidth){
@@ -16,35 +14,37 @@ if(window.innerHeight > window.innerWidth){
 
 let currentCenter = findCurrentCenter()
 
-currentCenter.classList.add('center')
+currentCenter.classList.add('center') // first image x + 0.4 *minSide* i = width/2
+
+function findCurrentCenter(){
+    if(window.innerHeight > window.innerWidth){
+        minSide = window.innerWidth;
+    }else{
+        minSide = window.innerHeight;
+    }
+    let i = Math.floor((window.innerWidth/2 - images.item(0).getBoundingClientRect().x) / (0.4*minSide));
+    if (i < 0) i = 0;
+    else if (i >= images.length) i = images.length -1;
+    return images.item(i);
+}
+
+function changeCenter(){
+    currentCenter.classList.remove('center');
+
+    currentCenter = findCurrentCenter();
+
+    currentCenter.classList.add('center');
+
+    title.textContent = currentCenter.dataset.title;
+}
+
+
+
+const handleOnDown = e => slide.dataset.mouseDownAt = e.clientX;
 
 const handleOnUp = () => {
     slide.dataset.mouseDownAt = "0";  
     slide.dataset.prevPercentage = slide.dataset.percentage;
-}
-
-function findCurrentCenter(){
-    if(window.innerHeight > window.innerWidth){
-        minSide = window.innerWidth
-    }else{
-        minSide = window.innerHeight
-    }
-
-    for(const image of images){
-        if(image.getBoundingClientRect().x <= (window.innerWidth/2 + 0.4 * minSide) && image.getBoundingClientRect().x >= (window.innerWidth/2 - 0.4 * minSide))
-            return image
-    }
-    return images.item(0)
-}
-
-function changeCenter(){
-    currentCenter.classList.remove('center')
-
-    currentCenter = findCurrentCenter();
-
-    currentCenter.classList.add('center')
-
-    title.textContent = currentCenter.dataset.title
 }
 
 const handleOnMove = e => {
@@ -53,7 +53,7 @@ const handleOnMove = e => {
     changeCenter()
 
     const mouseDelta = parseFloat(slide.dataset.mouseDownAt) - e.clientX,
-        maxDelta = images.length * (0.39 * minSide);
+        maxDelta = window.innerWidth;
 
     const percentage = (mouseDelta / maxDelta) * -100,
         nextPercentageUnconstrained = parseFloat(slide.dataset.prevPercentage) + percentage,
@@ -65,6 +65,7 @@ const handleOnMove = e => {
         transform: `translate(${nextPercentage}%, -50%)`
     }, { duration: 1200, fill: "forwards" });
 
+    setTimeout(changeCenter, 900)
     animation.onfinish = () => changeCenter();
 }
 

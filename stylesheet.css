@@ -8,6 +8,7 @@ body{
     text-align: center;
     font-size: larger;
     color: azure;
+    user-select: none;
 }
 
 #imageSlide{
@@ -21,18 +22,16 @@ body{
 }
 
 .image {
-    filter: blur(5px);
+    filter: blur(2px);
     display: flex;
     width: 40vmin;
     height: 60vmin;
     border-radius: 10px;
-    box-shadow: -1rem 0 3rem #000;
     transition: 0.4s ease-out;
     position: relative;
 }
 
 .image.center{
-    z-index: 1;
     filter: blur(0);
     transform: translateY(-1vmin);
     transition: 0.4s ease-out;
