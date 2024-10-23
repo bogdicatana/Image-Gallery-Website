@@ -2,19 +2,28 @@ const images = document.querySelectorAll(".image");
 
 const slide = document.getElementById("imageSlide");
 
-const title = document.getElementById("title")
+const title = document.getElementById("title");
+
+const returnToSlide = document.getElementById("return");
 
 let minSide;
 
 if(window.innerHeight > window.innerWidth){
-    minSide = window.innerWidth
+    minSide = window.innerWidth;
 }else{
-    minSide = window.innerHeight
+    minSide = window.innerHeight;
 }
 
-let currentCenter = findCurrentCenter()
+let currentCenter = findCurrentCenter();
 
-currentCenter.classList.add('center') // first image x + 0.4 *minSide* i = width/2
+// let titleUp = () => title.animate({
+//     transform : `translateY(-10vh)`
+// }, { duration: 100, easing:"ease-out", fill: "forwards" });
+// let titleDown = () => title.animate({
+//     transform : `translateY(0vh)`
+// }, { duration: 100, fill: "forwards" });
+
+currentCenter.classList.add('center');
 
 function findCurrentCenter(){
     if(window.innerHeight > window.innerWidth){
@@ -36,6 +45,12 @@ function changeCenter(){
     currentCenter.classList.add('center');
 
     title.textContent = currentCenter.dataset.title;
+
+    // titleUp().play();
+    // titleUp().onfinish = () => {
+    //     title.textContent = currentCenter.dataset.title;
+    //     titleDown().play();
+    // }
 }
 
 
@@ -49,8 +64,6 @@ const handleOnUp = () => {
 
 const handleOnMove = e => {
     if(slide.dataset.mouseDownAt === "0") return;
-    
-    changeCenter()
 
     const mouseDelta = parseFloat(slide.dataset.mouseDownAt) - e.clientX,
         maxDelta = window.innerWidth;
@@ -76,52 +89,83 @@ for(const image of images){
 
 let mouseMoved = false;
 
-window.onmousemove = e => {
-    handleOnMove(e);
-    mouseMoved = true;
-};
+function enableEvents(){
+    window.onmousemove = e => {
+        handleOnMove(e);
+        mouseMoved = true;
+    };
 
-window.onmousedown = e => {
-    handleOnDown(e);
-    mouseMoved = false;
-};
+    window.onmousedown = e => {
+        handleOnDown(e);
+        mouseMoved = false;
+    };
 
-window.onmouseup = e => {
-    handleOnUp(e);
-    if (!mouseMoved) {
-        const target = e.target.closest('.image');
-        if (target) {
-            target.click();
+    window.onmouseup = e => {
+        handleOnUp(e);
+        if (!mouseMoved) {
+            const target = e.target.closest('.image');
+            if (target) {
+                target.click();
+            }
         }
+    };
+
+    for (let i = 0; i < images.length; i++) {
+        images[i].addEventListener('click', handleImageClick, { passive: true });
     }
-};
-
-for(let i = 0; i < images.length; i++){
-    images[i].addEventListener('click', function(){
-        if (mouseMoved) return;
-        images[i].classList.add("expanded");
-        slide.classList.add("expanded");
-        images[i].animate({
-            width: '100vw',
-            height: '100vh',
-            transform: `translateY(0vmin)`
-        }, {duration: 1000, easing: "ease-out", fill: "forwards"});
-        slide.animate({
-            gap: 0,
-            top: 0,
-            left: 0,
-            transform: `translate(0%, 0%)`
-        }, {duration: 1000, easing: "ease-out", fill: "forwards"});
-        title.style.zIndex = 1000;
-        title.animate({
-            top: '50%',
-            left: '50%',
-            position: 'absolute',
-            transform: `translate(-50%, -50%) scale(2)`,
-            opacity: 1
-        }, {duration: 1000, easing: "ease-out", fill: "forwards"});
-        for(let j = 0; j < images.length; j++){
-            if(i !== j) images[j].classList.add("dead");
-        }
-    });
 }
+
+function disableEvents() {
+    window.onmousemove = null;
+    window.onmousedown = null;
+    window.onmouseup = null;
+    for (let i = 0; i < images.length; i++) {
+        images[i].removeEventListener('click', handleImageClick);
+    }
+}
+
+function handleImageClick(e) {
+    if (mouseMoved) return;
+    const image = e.currentTarget;
+    image.classList.add("expanded");
+    returnToSlide.classList.add("expanded");
+    slide.animate({
+        gap: 0,
+        top: 0,
+        left: 0,
+        transform: `translate(0%, 0%)`
+    }, { duration: 1000, easing: "ease-out", fill: "forwards" });
+    title.textContent = image.dataset.title;
+    title.animate({
+        transform: `translateY(40vh) scale(2)`
+    }, { duration: 1000, easing: "ease-out", fill: "forwards" });
+    for (let j = 0; j < images.length; j++) {
+        if (image !== images[j]) images[j].classList.add('dead');
+    }
+    disableEvents();
+}
+
+function handleReturn(e){
+    for(const image of images){
+        if(image.classList.contains("expanded")) image.classList.remove("expanded");
+        else if(image.classList.contains("dead")) image.classList.remove("dead");
+    }
+    returnToSlide.classList.remove("expanded");
+    if(slide.dataset.prevPercentage === "undefined") slide.dataset.prevPercentage = 0;
+    percent = slide.dataset.prevPercentage;
+    slide.animate({
+        gap: '1vmin',
+        top: '50%',
+        left: '50%',
+        transform: `translate(${percent}%, -50%)`
+    }, { duration: 1000, easing: "ease-in", fill: "forwards" });
+    const animateTitle = title.animate({
+        transform: `translateY(0vh) scale(1)`
+    }, { duration: 1000, easing: "ease-in", fill: "forwards" });
+    animateTitle.onfinish = () => changeCenter();
+    enableEvents();
+}
+
+enableEvents();
+
+returnToSlide.addEventListener('click', handleReturn);
