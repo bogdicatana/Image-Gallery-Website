@@ -49,7 +49,7 @@ const handleOnUp = () => {
 
 const handleOnMove = e => {
     if(slide.dataset.mouseDownAt === "0") return;
-
+    
     changeCenter()
 
     const mouseDelta = parseFloat(slide.dataset.mouseDownAt) - e.clientX,
@@ -74,22 +74,54 @@ for(const image of images){
 }
 
 
-for(const image of images){
-    image.addEventListener('click', function(){
-        image.classList.add("expanded");
+let mouseMoved = false;
+
+window.onmousemove = e => {
+    handleOnMove(e);
+    mouseMoved = true;
+};
+
+window.onmousedown = e => {
+    handleOnDown(e);
+    mouseMoved = false;
+};
+
+window.onmouseup = e => {
+    handleOnUp(e);
+    if (!mouseMoved) {
+        const target = e.target.closest('.image');
+        if (target) {
+            target.click();
+        }
+    }
+};
+
+for(let i = 0; i < images.length; i++){
+    images[i].addEventListener('click', function(){
+        if (mouseMoved) return;
+        images[i].classList.add("expanded");
         slide.classList.add("expanded");
-        const percentage = 0;
+        images[i].animate({
+            width: '100vw',
+            height: '100vh',
+            transform: `translateY(0vmin)`
+        }, {duration: 1000, easing: "ease-out", fill: "forwards"});
         slide.animate({
-            transform: `translate(${percentage}%, 0%)`
-        }, {duration: 100, fill: "forwards"});
-        for(const image2 of images){
-            if(image2 != image) image2.classList.add("dead");
+            gap: 0,
+            top: 0,
+            left: 0,
+            transform: `translate(0%, 0%)`
+        }, {duration: 1000, easing: "ease-out", fill: "forwards"});
+        title.style.zIndex = 1000;
+        title.animate({
+            top: '50%',
+            left: '50%',
+            position: 'absolute',
+            transform: `translate(-50%, -50%) scale(2)`,
+            opacity: 1
+        }, {duration: 1000, easing: "ease-out", fill: "forwards"});
+        for(let j = 0; j < images.length; j++){
+            if(i !== j) images[j].classList.add("dead");
         }
     });
 }
-
-window.onmousedown = e => handleOnDown(e);
-
-window.onmouseup = e => handleOnUp(e);
-
-window.onmousemove = e => handleOnMove(e);
