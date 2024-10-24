@@ -6,7 +6,7 @@ body{
 
 #title{
     text-align: center;
-    font-size: 2vmin;
+    font-size: 4vmin;
     color: azure;
     width: 100vw;
     position: absolute;
@@ -81,5 +81,6 @@ body{
 
 .image.dead{
     width: 0;
+    height: 100vh;
     transition: 1s ease-out;
 }

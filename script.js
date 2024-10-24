@@ -69,6 +69,25 @@ const handleOnMove = e => {
     animation.onfinish = () => changeCenter();
 }
 
+const handleWheel = e => {
+    if(slide.dataset.mouseDownAt === "0") return;
+
+    const mouseDelta = e.deltaY,
+        maxDelta = window.innerWidth;
+
+    const percentage = (mouseDelta / maxDelta) * -100,
+        nextPercentageUnconstrained = parseFloat(slide.dataset.prevPercentage) + percentage,
+        nextPercentage = Math.max(Math.min(nextPercentageUnconstrained, 0), -100);
+
+    slide.dataset.percentage = nextPercentage;
+
+    const animation = slide.animate({
+        transform: `translate(${nextPercentage}%, -50%)`
+    }, { duration: 1200, fill: "forwards" });
+
+    setTimeout(changeCenter, 1100)
+    animation.onfinish = () => changeCenter();
+}
 
 let mouseMoved = false;
 
@@ -93,6 +112,13 @@ function enableEvents(){
         }
     };
 
+    window.onwheel = e => {
+        slide.dataset.mouseDownAt = e.clientX;
+        handleWheel(e);
+        slide.dataset.mouseDownAt = "0";  
+        slide.dataset.prevPercentage = slide.dataset.percentage;
+    };
+
     for (let i = 0; i < images.length; i++) {
         images[i].addEventListener('click', handleImageClick, { passive: true });
     }
@@ -102,6 +128,7 @@ function disableEvents() {
     window.onmousemove = null;
     window.onmousedown = null;
     window.onmouseup = null;
+    window.onwheel = null;
     for (let i = 0; i < images.length; i++) {
         images[i].removeEventListener('click', handleImageClick);
     }
