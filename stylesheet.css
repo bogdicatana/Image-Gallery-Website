@@ -64,7 +64,7 @@ body{
 .image:not(.image.center){
     filter: blur(1);
     transform: translateY(0vmin);
-    transition: 0.4s ease-out;
+    transition: 1s ease-out;
 }
 
 .image.expanded{
@@ -79,6 +79,5 @@ body{
 
 .image.dead{
     width: 0;
-    height: 0;
     transition: 1s ease-out;
 }

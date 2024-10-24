@@ -16,13 +16,6 @@ if(window.innerHeight > window.innerWidth){
 
 let currentCenter = findCurrentCenter();
 
-// let titleUp = () => title.animate({
-//     transform : `translateY(-10vh)`
-// }, { duration: 100, easing:"ease-out", fill: "forwards" });
-// let titleDown = () => title.animate({
-//     transform : `translateY(0vh)`
-// }, { duration: 100, fill: "forwards" });
-
 currentCenter.classList.add('center');
 
 function findCurrentCenter(){
@@ -38,19 +31,13 @@ function findCurrentCenter(){
 }
 
 function changeCenter(){
-    currentCenter.classList.remove('center');
+    if(currentCenter.classList.contains('center')) currentCenter.classList.remove('center');
 
     currentCenter = findCurrentCenter();
 
     currentCenter.classList.add('center');
 
     title.textContent = currentCenter.dataset.title;
-
-    // titleUp().play();
-    // titleUp().onfinish = () => {
-    //     title.textContent = currentCenter.dataset.title;
-    //     titleDown().play();
-    // }
 }
 
 
@@ -80,10 +67,6 @@ const handleOnMove = e => {
 
     setTimeout(changeCenter, 1000)
     animation.onfinish = () => changeCenter();
-}
-
-for(const image of images){
-    image.classList.add("default");
 }
 
 
@@ -146,24 +129,30 @@ function handleImageClick(e) {
 }
 
 function handleReturn(e){
+    currentCenter.classList.remove('center');
     for(const image of images){
         if(image.classList.contains("expanded")) image.classList.remove("expanded");
         else if(image.classList.contains("dead")) image.classList.remove("dead");
     }
     returnToSlide.classList.remove("expanded");
+
     if(slide.dataset.prevPercentage === "undefined") slide.dataset.prevPercentage = 0;
     percent = slide.dataset.prevPercentage;
+
     slide.animate({
         gap: '1vmin',
         top: '50%',
         left: '50%',
         transform: `translate(${percent}%, -50%)`
     }, { duration: 1000, easing: "ease-in", fill: "forwards" });
+
     const animateTitle = title.animate({
         transform: `translateY(0vh) scale(1)`
     }, { duration: 1000, easing: "ease-in", fill: "forwards" });
-    animateTitle.onfinish = () => changeCenter();
-    enableEvents();
+    animateTitle.onfinish = () => {
+        changeCenter();
+        enableEvents();
+    };
 }
 
 enableEvents();
