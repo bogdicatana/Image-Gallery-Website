@@ -6,7 +6,7 @@ body{
 
 #title{
     text-align: center;
-    font-size: larger;
+    font-size: 2vmin;
     color: azure;
     width: 100vw;
     position: absolute;
@@ -28,6 +28,8 @@ body{
     pointer-events: none;
     transition: opacity 1s ease-out;
     user-select: none;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black;
 }
 
 #return.expanded{
