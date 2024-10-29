@@ -18,6 +18,11 @@ let currentCenter = findCurrentCenter();
 
 currentCenter.classList.add('center');
 
+function loadImages(){
+    let image = document.createElement('img');
+    
+}
+
 function findCurrentCenter(){
     if(window.innerHeight > window.innerWidth){
         minSide = window.innerWidth;
@@ -30,10 +35,13 @@ function findCurrentCenter(){
     return images.item(i);
 }
 
-function changeCenter(){
+function changeCenter(check = 0){
+    temp = findCurrentCenter();
+    if(currentCenter === temp && check === 0) return;
+
     if(currentCenter.classList.contains('center')) currentCenter.classList.remove('center');
 
-    currentCenter = findCurrentCenter();
+    currentCenter = temp;
 
     currentCenter.classList.add('center');
 
@@ -177,7 +185,7 @@ function handleReturn(e){
         transform: `translateY(0vh) scale(1)`
     }, { duration: 1000, easing: "ease-in", fill: "forwards" });
     animateTitle.onfinish = () => {
-        changeCenter();
+        changeCenter(1);
         enableEvents();
     };
 }
