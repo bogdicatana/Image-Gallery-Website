@@ -1,10 +1,15 @@
 local lfs = require("lfs")
 
 local function listFolders(path)
-    for file in lfs.dir(path) do
-        local attr = lfs.attributes(path .. '/' .. file)
-        if attr and attr.mode == "directory" and file ~= "." and file ~= ".." then
-            print(file)  -- Print folder name
+    for folder in lfs.dir(path) do
+        local folderAttributes = lfs.attributes(path .. '/' .. folder)
+        if folderAttributes and folderAttributes.mode == "directory" and folder ~= "." and folder ~= ".." then
+            print(folder)
+            for imageFile in lfs.dir(path .. '/' .. folder) do
+                if imageFile ~= "." and imageFile ~= ".." then
+                    print(imageFile)
+                end
+            end
         end
     end
 end
