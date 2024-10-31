@@ -7,6 +7,7 @@ const title = document.getElementById("title");
 const returnToSlide = document.getElementById("return");
 
 let minSide;
+let expanded = false;
 
 if(window.innerHeight > window.innerWidth){
     minSide = window.innerWidth;
@@ -38,6 +39,7 @@ function findCurrentCenter(){
 function changeCenter(check = 0){
     temp = findCurrentCenter();
     if(currentCenter === temp && check === 0) return;
+    if(expanded) return;
 
     if(currentCenter.classList.contains('center')) currentCenter.classList.remove('center');
 
@@ -100,6 +102,7 @@ const handleWheel = e => {
 let mouseMoved = false;
 
 function enableEvents(){
+    expanded = false;
     window.onmousemove = e => {
         handleOnMove(e);
         mouseMoved = true;
@@ -133,6 +136,7 @@ function enableEvents(){
 }
 
 function disableEvents() {
+    expanded = true;
     window.onmousemove = null;
     window.onmousedown = null;
     window.onmouseup = null;
@@ -185,8 +189,8 @@ function handleReturn(e){
         transform: `translateY(0vh) scale(1)`
     }, { duration: 1000, easing: "ease-in", fill: "forwards" });
     animateTitle.onfinish = () => {
-        changeCenter(1);
         enableEvents();
+        changeCenter(1);
     };
 }
 
