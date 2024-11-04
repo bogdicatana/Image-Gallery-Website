@@ -20,8 +20,17 @@ let currentCenter = findCurrentCenter();
 currentCenter.classList.add('center');
 
 function loadImages(){
-    let image = document.createElement('img');
-    
+    fetch('http://localhost:8000/images.json')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            // data.images.forEach((imageData, index) => {
+            //     const img = images[index];
+            //     img.src = imageData.src;
+            //     img.dataset.title = imageData.title;
+            // });
+        })
+        .catch(error => console.error('Error loading images:', error));
 }
 
 function findCurrentCenter(){
@@ -195,5 +204,5 @@ function handleReturn(e){
 }
 
 enableEvents();
-
+loadImages();
 returnToSlide.addEventListener('click', handleReturn);
