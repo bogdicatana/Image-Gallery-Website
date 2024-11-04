@@ -1,4 +1,4 @@
-const images = document.querySelectorAll(".image");
+let images;
 
 const slide = document.getElementById("imageSlide");
 
@@ -15,23 +15,7 @@ if(window.innerHeight > window.innerWidth){
     minSide = window.innerHeight;
 }
 
-let currentCenter = findCurrentCenter();
-
-currentCenter.classList.add('center');
-
-function loadImages(){
-    fetch('http://localhost:8000/images.json')
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            // data.images.forEach((imageData, index) => {
-            //     const img = images[index];
-            //     img.src = imageData.src;
-            //     img.dataset.title = imageData.title;
-            // });
-        })
-        .catch(error => console.error('Error loading images:', error));
-}
+let currentCenter;
 
 function findCurrentCenter(){
     if(window.innerHeight > window.innerWidth){
@@ -142,6 +126,7 @@ function enableEvents(){
     for (let i = 0; i < images.length; i++) {
         images[i].addEventListener('click', handleImageClick, { passive: true });
     }
+    console.log("hellow");
 }
 
 function disableEvents() {
@@ -203,6 +188,33 @@ function handleReturn(e){
     };
 }
 
-enableEvents();
+function initialize(){
+    images = document.querySelectorAll(".image");
+
+    currentCenter = findCurrentCenter();
+    currentCenter.classList.add('center');
+
+    console.log("1");
+    enableEvents();
+    returnToSlide.addEventListener('click', handleReturn);
+}
+
+function loadImages(){
+    fetch('images.json')
+        .then(response => response.json())
+        .then(data => {
+            for(const key in data){
+                console.log("resources/" + key + "/" + data[key][0]);
+                const img = document.createElement('img');
+                img.src = "resources/" + key + "/" + data[key][0];
+                img.dataset.title = key.replace(/_/g, ' ');
+                img.classList.add('image');
+                img.draggable = false;
+                slide.appendChild(img);
+            }
+            initialize();
+        })
+        .catch(error => console.error('Error loading images:', error));
+}
+
 loadImages();
-returnToSlide.addEventListener('click', handleReturn);
