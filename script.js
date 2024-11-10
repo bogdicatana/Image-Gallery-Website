@@ -6,6 +6,10 @@ const title = document.getElementById("title");
 
 const returnToSlide = document.getElementById("return");
 
+const imageList = document.querySelector('.image-list');
+
+let isTransitioning = false;
+
 let minSide;
 let expanded = false;
 
@@ -43,9 +47,27 @@ function changeCenter(check = 0){
     title.textContent = currentCenter.dataset.title;
 }
 
+function loadImagesGrid(){
+    fetch('images.json')
+        .then(response => response.json())
+        .then(data => {
+            imageList.style.display = 'grid';
+            const key = title.textContent.replace(/ /g, '_');
+            for(const i in data[key]){
+                const img = document.createElement('img');
+                img.src = "resources/" + key + "/" + data[key][i];
+                img.draggable = false;
+                imageList.appendChild(img);
+            }
+        })
+        .catch(error => console.error('Error loading images:', error));
+}
+
 
 
 const handleOnDown = e => slide.dataset.mouseDownAt = e.clientX;
+
+const handleOnDownExpanded = e => slide.dataset.mouseDownAt = e.clientY;
 
 const handleOnUp = () => {
     slide.dataset.mouseDownAt = "0";  
@@ -72,6 +94,33 @@ const handleOnMove = e => {
     animation.onfinish = () => changeCenter();
 }
 
+const handleOnMoveExpanded = e => {
+    if(slide.dataset.mouseDownAt === "0") return;
+
+    const mouseDelta = parseFloat(slide.dataset.mouseDownAt) - e.clientY,
+        maxDelta = window.innerHeight;
+
+    const percentage = (mouseDelta / maxDelta) * -100,
+        nextPercentageUnconstrained = parseFloat(slide.dataset.prevPercentage) + percentage,
+        nextPercentage = Math.min(nextPercentageUnconstrained, 0);
+
+    slide.animate({
+        transform: `translate(0%, ${nextPercentage}%)`
+    }, { duration: 1200, fill: "forwards" });
+
+    const movement = Math.max(nextPercentage/100 * maxDelta, -imageList.offsetHeight);
+    
+    if(movement !== -imageList.offsetHeight) slide.dataset.percentage = nextPercentage;
+
+    imageList.animate({
+        transform: `translateY(${movement}px)`
+    }, { duration: 1200, fill: "forwards" });
+
+    title.animate({
+        transform: `translateY(${nextPercentage/100 * maxDelta + 0.4*maxDelta}px) scale(2)`
+    }, { duration: 1200, fill: "forwards" });
+}
+
 const handleWheel = e => {
     if(slide.dataset.mouseDownAt === "0") return;
 
@@ -90,6 +139,33 @@ const handleWheel = e => {
 
     setTimeout(changeCenter, 1100)
     animation.onfinish = () => changeCenter();
+}
+
+const handleWheelExpanded = e => {
+    if(slide.dataset.mouseDownAt === "0") return;
+
+    const mouseDelta = e.deltaY,
+        maxDelta = window.innerHeight;
+
+    const percentage = (mouseDelta / maxDelta) * -100,
+        nextPercentageUnconstrained = parseFloat(slide.dataset.prevPercentage) + percentage,
+        nextPercentage = Math.min(nextPercentageUnconstrained, 0);
+
+    slide.animate({
+        transform: `translate(0%, ${nextPercentage}%)`
+    }, { duration: 1200, fill: "forwards" });
+
+    const movement = Math.max(nextPercentage/100 * maxDelta, -imageList.offsetHeight);
+    
+    if(movement !== -imageList.offsetHeight) slide.dataset.percentage = nextPercentage;
+
+    imageList.animate({
+        transform: `translateY(${movement}px)`
+    }, { duration: 1200, fill: "forwards" });
+
+    title.animate({
+        transform: `translateY(${nextPercentage/100 * maxDelta + 0.4*maxDelta}px) scale(2)`
+    }, { duration: 1200, fill: "forwards" });
 }
 
 let mouseMoved = false;
@@ -126,22 +202,34 @@ function enableEvents(){
     for (let i = 0; i < images.length; i++) {
         images[i].addEventListener('click', handleImageClick, { passive: true });
     }
-    console.log("hellow");
 }
 
 function disableEvents() {
+    slide.dataset.prevPercentage = 0;
     expanded = true;
-    window.onmousemove = null;
-    window.onmousedown = null;
-    window.onmouseup = null;
-    window.onwheel = null;
+    window.onmousemove = e =>{
+        handleOnMoveExpanded(e);
+        mouseMoved= true;
+    };
+    window.onwheel = e =>{
+        slide.dataset.mouseDownAt = e.clientY;
+        handleWheelExpanded(e);
+        slide.dataset.mouseDownAt = "0";  
+        slide.dataset.prevPercentage = slide.dataset.percentage;
+    };
+    window.onmousedown = e => {
+        handleOnDownExpanded(e);
+        mouseMoved = false;
+    };
     for (let i = 0; i < images.length; i++) {
         images[i].removeEventListener('click', handleImageClick);
     }
+    loadImagesGrid();
 }
 
 function handleImageClick(e) {
     if (mouseMoved) return;
+    slide.dataset.prevPercentageUnexpanded = slide.dataset.prevPercentage;
     const image = e.currentTarget;
     image.classList.add("expanded");
     returnToSlide.classList.add("expanded");
@@ -162,6 +250,14 @@ function handleImageClick(e) {
 }
 
 function handleReturn(e){
+    imageList.animate({
+        transform: `translateY(100%)`
+    }, { duration: 1000, fill: "forwards" }).onfinish = () => {
+        imageList.style.display = 'none';
+        while (imageList.firstChild) {
+            imageList.removeChild(imageList.firstChild);
+        }
+    };
     currentCenter.classList.remove('center');
     for(const image of images){
         if(image.classList.contains("expanded")) image.classList.remove("expanded");
@@ -169,8 +265,10 @@ function handleReturn(e){
     }
     returnToSlide.classList.remove("expanded");
 
-    if(slide.dataset.prevPercentage === "undefined") slide.dataset.prevPercentage = 0;
-    percent = slide.dataset.prevPercentage;
+    if(slide.dataset.prevPercentageUnexpanded === "undefined") slide.dataset.prevPercentageUnexpanded = 0;
+    slide.dataset.prevPercentage = slide.dataset.prevPercentageUnexpanded;
+    slide.dataset.percentage = slide.dataset.prevPercentageUnexpanded;
+    percent = slide.dataset.prevPercentageUnexpanded;
 
     slide.animate({
         gap: '1vmin',
@@ -193,8 +291,7 @@ function initialize(){
 
     currentCenter = findCurrentCenter();
     currentCenter.classList.add('center');
-
-    console.log("1");
+    title.textContent = currentCenter.dataset.title;
     enableEvents();
     returnToSlide.addEventListener('click', handleReturn);
 }
@@ -204,7 +301,6 @@ function loadImages(){
         .then(response => response.json())
         .then(data => {
             for(const key in data){
-                console.log("resources/" + key + "/" + data[key][0]);
                 const img = document.createElement('img');
                 img.src = "resources/" + key + "/" + data[key][0];
                 img.dataset.title = key.replace(/_/g, ' ');
