@@ -30,7 +30,13 @@ https://github.com/user-attachments/assets/66d3e27e-91fd-4ebe-9639-1eed12ca8d8e
             ├── Category_Name_2/ 
                 │ └── ...
 
-2. Start the local server:
+2. Set up the image library:
+
+    ``` bash
+    lua getImages.lua
+    ```
+   
+3. Start the local server:
 
     ``` bash
     python3 -m http.server 8000 &
@@ -42,9 +48,9 @@ https://github.com/user-attachments/assets/66d3e27e-91fd-4ebe-9639-1eed12ca8d8e
     ./start.sh
     ```
 
-3. Visit http://localhost:8000/website.html in your web browser
+4. Visit http://localhost:8000/website.html in your web browser
 
-4. To stop the server:
+5. To stop the server:
 
     For UNIX-based systems only:
 
