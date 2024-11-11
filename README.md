@@ -62,9 +62,7 @@ https://github.com/user-attachments/assets/66d3e27e-91fd-4ebe-9639-1eed12ca8d8e
 
 ### Controls
 
-- Mouse drag/swipe: Navigate through images horizontally
-
-- Mouse wheel: Scroll through images
+- Mouse drag/swipe/mouse wheel: Navigate through images
 
 - Click on an image in the gallery view: Expand the image
 
