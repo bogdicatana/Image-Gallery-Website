@@ -1,6 +1,6 @@
 # Image Gallery Website
 
-An interactive image gallery website with smooth animations. Features a horizontal sliding gallery with image expansion and grid view capabilities as well as a lua script to let the user.
+An interactive image gallery website with smooth animations. Features a horizontal sliding gallery with image expansion and grid view capabilities as well as a lua script to let the user load their own images into it.
 
 ## Features
 
