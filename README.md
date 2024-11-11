@@ -20,7 +20,7 @@ https://github.com/user-attachments/assets/66d3e27e-91fd-4ebe-9639-1eed12ca8d8e
 
 ## Setup
 
-1. Place your images in the `resources` folder with the following structure:
+1. Create a `resources` folder and place your images in with the following structure:
 
         ├── resources/ 
             ├── Category_Name_1/ │ 
